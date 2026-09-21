@@ -1,6 +1,7 @@
 from grafo import Grafo
 from nodo import Nodo
 from arista import Arista
+import random
 
 class Generador_Grafo:
 
@@ -23,6 +24,65 @@ class Generador_Grafo:
             if i + m < orden:
                 G.agregar_arista(Arista(x, z))
         return G
+
+    def grafoErdosRenyi1(self, n, m, dirigido=False):
+        """
+        Genera grafo aleatorio con el modelo Erdos-Renyi
+        :param n: número de nodos (> 0)
+        :param m: número de aristas (>= n-1)
+        :param dirigido: el grafo es dirigido?
+        :return: grafo generado
+        """
+        G = Grafo(n, dirigido=dirigido)
+        grafoCompleto = []
+        for i in range(n - 1):
+            for j in range(i + 1, n):
+                grafoCompleto.append(Arista(Nodo(i), Nodo(j)))
+        subgrafo = random.sample(grafoCompleto, k = m)
+        for e in subgrafo:
+            G.agregar_arista(e)
+        return G
+
+    def grafoErdosRenyi2(self, n, m, dirigido=False):
+        """
+        Genera grafo aleatorio con el modelo Erdos-Renyi
+        :param n: número de nodos (> 0)
+        :param m: número de aristas (>= n-1)
+        :param dirigido: el grafo es dirigido?
+        :return: grafo generado
+        """
+        G = Grafo(n, dirigido=dirigido)
+        grafoCompleto = []
+        for i in range(n - 1):
+            for j in range(i + 1, n):
+                grafoCompleto.append(Arista(Nodo(i), Nodo(j)))
+        random.shuffle(grafoCompleto)
+        for i in range(m):
+            G.agregar_arista(grafoCompleto[i])
+        return G
+
+    def grafoErdosRenyi3(self, n, m, dirigido=False):
+        """
+        Genera grafo aleatorio con el modelo Erdos-Renyi
+        :param n: número de nodos (> 0)
+        :param m: número de aristas (>= n-1)
+        :param dirigido: el grafo es dirigido?
+        :return: grafo generado
+        """
+        G = Grafo(n, dirigido=dirigido)
+        aristas_uniformes = set()
+        nodos_ids = [i for i in range(n)]
+        while len(aristas_uniformes) < m:
+            nodos = random.sample(nodos_ids, k=2)
+            par = (nodos[0], nodos[1])
+            aristas_uniformes.add(par)
+        for e in aristas_uniformes:
+            nodo1 = Nodo(e[0])
+            nodo2 = Nodo(e[1])
+            arista = Arista(nodo1, nodo2)
+            G.agregar_arista(arista)
+        return G
+
 
 
 

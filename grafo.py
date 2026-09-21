@@ -1,4 +1,6 @@
+from nodo import Nodo
 from arista import Arista
+
 import pydot
 
 class Grafo:
@@ -10,12 +12,10 @@ class Grafo:
         self.n = n
         self.m = 0
         self.dirigido = dirigido
-        self.lista_nodos = [None for i in range(n)]
+        self.lista_nodos = [Nodo(i) for i in range(n)]
 
     def agregar_arista(self, e: Arista):
         """agrega una arista al grafo"""
-        self.lista_nodos[e.u.id] = e.u
-        self.lista_nodos[e.v.id] = e.v
         self.lista_adyacencia[e.u.id].append(e.v)
         if not self.dirigido:
             self.lista_adyacencia[e.v.id].append(e.u)
@@ -33,6 +33,10 @@ class Grafo:
         tipo_grafo = "digraph" if self.dirigido else "graph"
 
         grafo_dot = pydot.Dot("G", graph_type=tipo_grafo)
+
+        # 1) Añadir todos los nodos (incluso aislados)
+        for nodo in self.lista_nodos:
+                grafo_dot.add_node(pydot.Node(nodo.id))
 
         for e in self.obtener_aristas():
             grafo_dot.add_edge(pydot.Edge(e.u.id, e.v.id))
