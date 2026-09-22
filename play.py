@@ -1,4 +1,4 @@
-# import random
+import random
 
 # opciones = ["a", "b", "c", "d"]
 
@@ -20,8 +20,7 @@
 # # k elementos CON repetición
 # random.choices(opciones, k=5)
 
-n=10
+p=0.5
 
-for i in range(n - 1):#[0->n-2]
-    for j in range(i + 1, n):
-        print(i, j)
+for i in range(10):
+    print(random.random() < p)

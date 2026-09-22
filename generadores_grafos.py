@@ -50,7 +50,22 @@ class Generador_Grafo:
             G.agregar_arista(arista)
         return G
 
-
-
+    def grafoGilbert(self, n, p, dirigido=False):
+        """
+        Genera grafo aleatorio con el modelo Gilbert
+        :param n: número de nodos (> 0)
+        :param p: probabilidad de crear una arista (0, 1)
+        :param dirigido: el grafo es dirigido?
+        :return: grafo generado
+        """
+        G = Grafo(n, dirigido=dirigido)
+        nodos = random.sample(range(n), n)
+        for i in range(n - 1):
+            for j in range(i + 1, n):
+                nodo1 = nodos[i]
+                nodo2 = nodos[j]
+                if random.random() < p:
+                    G.agregar_arista(Arista(Nodo(nodo1), Nodo(nodo2)))
+        return G
 
 
