@@ -31,10 +31,9 @@ class Grafo:
         """guarda el grafo en un archivo con formato GraphViz"""
 
         tipo_grafo = "digraph" if self.dirigido else "graph"
-
         grafo_dot = pydot.Dot("G", graph_type=tipo_grafo)
 
-        # 1) Añadir todos los nodos (incluso aislados)
+        #Añadir todos los nodos (incluso aislados)
         for nodo in self.lista_nodos:
                 grafo_dot.add_node(pydot.Node(nodo.id))
 

@@ -68,4 +68,25 @@ class Generador_Grafo:
                     G.agregar_arista(Arista(Nodo(nodo1), Nodo(nodo2)))
         return G
 
+    def grafoGeografico(self, n, r, dirigido=False):
+        """
+        Genera grafo aleatorio con el modelo geográfico simple
+        :param n: número de nodos (> 0)
+        :param r: distancia máxima para crear un nodo (0, 1)
+        :param dirigido: el grafo es dirigido?
+        :return: grafo generado
+        """
+        G = Grafo(n, dirigido)
+        coordenadas = [ (random.uniform(0, 1), random.uniform(0, 1)) for _ in range(n)]
+        for i in range(n - 1):
+            for j in range(i + 1, n):
+                x_i = coordenadas[i][0]
+                y_i = coordenadas[i][1]
+                x_j = coordenadas[j][0]
+                y_j = coordenadas[j][1]
+                distancia = ((x_i - x_j) ** 2 + (y_i - y_j) ** 2) ** 0.5
+                if distancia <= r:
+                    G.agregar_arista(Arista(Nodo(i), Nodo(j)))
+        return G
+
 
