@@ -126,6 +126,32 @@ class Generador_Grafo:
             
         return G
 
+    def grafoDorogovtsevMendes(self, n, dirigido=False):
+        """
+        Genera grafo aleatorio con el modelo Barabasi-Albert
+        :param n: número de nodos (≥ 3)
+        :param dirigido: el grafo es dirigido?
+        :return: grafo generado
+        """
+        G = Grafo(n, dirigido)
+
+        G.agregar_arista(Arista(Nodo(0), Nodo(1)))
+        G.agregar_arista(Arista(Nodo(0), Nodo(2)))
+        G.agregar_arista(Arista(Nodo(1), Nodo(2)))
+        lista_aristas = [(0,1), (0,2), (1,2)]
+
+        for i in range(3, n):
+            e = random.sample(lista_aristas, 1)[0]
+            nod1 = e[0]
+            nod2 = e[1]
+            G.agregar_arista(Arista(Nodo(i), Nodo(nod1)))
+            G.agregar_arista(Arista(Nodo(i), Nodo(nod2)))
+            lista_aristas.append((i, nod1))
+            lista_aristas.append((i, nod2))
+
+        return G
+
+
             
 
 
