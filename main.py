@@ -32,10 +32,10 @@ G_grafoDorogovtsevMendes50 = GG.grafoDorogovtsevMendes(50, dirigido=False)
 G_grafoDorogovtsevMendes200 = GG.grafoDorogovtsevMendes(200, dirigido=False)
 G_grafoDorogovtsevMendes500 = GG.grafoDorogovtsevMendes(500, dirigido=False)
 
+print("ok")
 
 
-
-#crear .dot
+# #crear .dot
 G_malla50.guardar_grafo('./grafosMalla/Grafo_Malla_Nodos=50_No_Dirigido_m=10_n=5.dot')
 G_malla200.guardar_grafo('./grafosMalla/Grafo_Malla_Nodos=200_No_Dirigido_m=20_n=10.dot')
 G_malla500.guardar_grafo('./grafosMalla/Grafo_Malla_Nodos=500_No_Dirigido_m=25_n=20.dot')
