@@ -89,4 +89,43 @@ class Generador_Grafo:
                     G.agregar_arista(Arista(Nodo(i), Nodo(j)))
         return G
 
+    def grafoBarabasiAlbert(self, n, d, dirigido=False):
+        """
+        Genera grafo aleatorio con el modelo Barabasi-Albert
+        :param n: número de nodos (> 0)
+        :param d: grado máximo esperado por cada nodo (> 1)
+        :param dirigido: el grafo es dirigido?
+        :return: grafo generado
+        """
+        lista_frecuencia_vertices = [x for x in range(d)]
+        grado = [0 for _ in range(n)]
+        G = Grafo(n, dirigido)
+
+        for i in range(d - 1):
+            for j in range(i + 1, d):
+                G.agregar_arista(Arista(Nodo(i), Nodo(j)))
+                lista_frecuencia_vertices.append(i)
+                lista_frecuencia_vertices.append(j)
+                grado[i] += 1
+                grado[j] += 1
+                
+        for i in range(d, n):
+            k = min(d, len(lista_frecuencia_vertices))
+            adyacentes = set(random.sample(lista_frecuencia_vertices, k))
+            lista_frecuencia_vertices.append(i)
+            for ady in adyacentes:
+                G.agregar_arista(Arista(Nodo(i), Nodo(ady)))
+                grado[i] += 1
+                grado[ady] += 1
+                lista_frecuencia_vertices.append(i)
+                lista_frecuencia_vertices.append(ady)
+                if grado[i] == d:
+                    lista_frecuencia_vertices = [x for x in lista_frecuencia_vertices if x!=i]
+                if grado[ady] == d:
+                    lista_frecuencia_vertices = [x for x in lista_frecuencia_vertices if x!=ady]
+            
+        return G
+
+            
+
 

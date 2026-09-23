@@ -27,6 +27,16 @@ class Grafo:
     def orden(self):
         return self.n
 
+    def grado_vertice(self, x:Nodo):
+        if not self.dirigido:
+            return len(self.lista_adyacencia[x.id])
+        else:
+            grado = 0
+            for arista in self.obtener_aristas():
+                if arista.u.id==x.id or arista.v.id==x.id:
+                    grado += 1
+        return grado
+
     def guardar_grafo(self, ruta:str):
         """guarda el grafo en un archivo con formato GraphViz"""
 
