@@ -1,9 +1,24 @@
+"""
+Módulo que define la clase Generador_Grafo, la cual agrupa los
+distintos modelos de generación de grafos (deterministas y
+aleatorios) soportados por esta biblioteca: malla, Erdos-Renyi,
+Gilbert, geográfico simple, Barabasi-Albert y Dorogovtsev-Mendes.
+"""
+
 from grafo import Grafo
 from nodo import Nodo
 from arista import Arista
 import random
 
 class Generador_Grafo:
+    """
+    Agrupa los distintos algoritmos de generación de grafos
+    disponibles en la biblioteca.
+ 
+    Cada método construye y devuelve una nueva instancia de Grafo
+    según el modelo correspondiente, y no depende de estado propio
+    de la instancia de Generador_Grafo.
+    """
 
     def grafoMalla(self, m, n, dirigido=False):
         """
@@ -128,7 +143,7 @@ class Generador_Grafo:
 
     def grafoDorogovtsevMendes(self, n, dirigido=False):
         """
-        Genera grafo aleatorio con el modelo Barabasi-Albert
+        Genera grafo aleatorio con el modelo Dorogovtsev-Mendes
         :param n: número de nodos (≥ 3)
         :param dirigido: el grafo es dirigido?
         :return: grafo generado

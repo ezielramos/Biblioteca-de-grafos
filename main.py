@@ -1,3 +1,13 @@
+"""
+Script principal de ejemplo.
+ 
+Genera un conjunto de grafos usando cada uno de los modelos
+implementados en Generador_Grafo (malla, Erdos-Renyi, Gilbert,
+geográfico simple, Barabasi-Albert y Dorogovtsev-Mendes), en tres
+tamaños (50, 200 y 500 nodos), y guarda cada uno como un archivo
+.dot (formato GraphViz), organizados en una carpeta por modelo.
+"""
+
 from generadores_grafos import Generador_Grafo
 
 GG = Generador_Grafo()
@@ -32,7 +42,6 @@ G_grafoDorogovtsevMendes50 = GG.grafoDorogovtsevMendes(50, dirigido=False)
 G_grafoDorogovtsevMendes200 = GG.grafoDorogovtsevMendes(200, dirigido=False)
 G_grafoDorogovtsevMendes500 = GG.grafoDorogovtsevMendes(500, dirigido=False)
 
-print("ok")
 
 
 # #crear .dot
