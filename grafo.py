@@ -7,6 +7,7 @@ exportarlos a formato GraphViz (.dot).
 from nodo import Nodo
 from arista import Arista
 import os
+from collections import deque
 
 import pydot
 
@@ -116,3 +117,47 @@ class Grafo:
                 elif nod.id > i:
                     aristas.append(Arista(self.lista_nodos[i], nod))
         return aristas
+
+    def BFS(self, s):
+        G = Grafo(self.n, False)
+        q = deque([s])
+        visit = [False for _ in range(self.n)]
+        visit[s] = True
+        while len(q) > 0:
+            u = q.popleft()
+            for v in self.lista_adyacencia[u]:
+                if not visit[v.id]:
+                    visit[v.id] = True
+                    q.append(v.id)
+                    G.agregar_arista(Arista(Nodo(u), v))
+        return G
+
+    def DFS_R(self, s):
+        G = Grafo(self.n, False)
+        visit = [False for _ in range(self.n)]
+        visit[s] = True
+        self._DFS_R_(s, visit, G)
+        return G
+
+    def _DFS_R_(self, x, visit, G):
+        for v in self.lista_adyacencia[x]:
+            if not visit[v.id]:
+                visit[v.id] = True
+                G.agregar_arista(Arista(Nodo(x), v))
+                self._DFS_R_(v.id, visit, G)
+
+    def DFS_I(self, s):
+        G = Grafo(self.n, False)
+        visit = [False] * self.n
+        pila = [(s, None)]
+        while pila:
+            x, padre = pila.pop()
+            if visit[x]:
+                continue
+            visit[x] = True
+            if padre is not None:
+                G.agregar_arista(Arista(self.lista_nodos[padre], self.lista_nodos[x]))
+            for v in self.lista_adyacencia[x]:
+                if not visit[v.id]:
+                    pila.append((v.id, x))
+        return G
