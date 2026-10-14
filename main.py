@@ -80,9 +80,9 @@ G_malla100 = GG.grafoMalla(10, 10, dirigido=False)
 G_malla500 = GG.grafoMalla(25, 20, dirigido=False)
 
 # #grafo Erdos Renyi
-# G_ErdosRenyi30 = GG.grafoErdosRenyi(30, 130, dirigido=False)
-# G_ErdosRenyi100 = GG.grafoErdosRenyi(100, 600 , dirigido=False)
-# G_ErdosRenyi500 = GG.grafoErdosRenyi(500, 1450, dirigido=False)
+G_ErdosRenyi30 = GG.grafoErdosRenyi(30, 130, dirigido=False)
+G_ErdosRenyi100 = GG.grafoErdosRenyi(100, 600 , dirigido=False)
+G_ErdosRenyi500 = GG.grafoErdosRenyi(500, 1450, dirigido=False)
 
 # #grafo Gilbert
 # G_grafoGilbert30 = GG.grafoGilbert(30, 0.7, dirigido=False)
@@ -106,20 +106,25 @@ G_malla500 = GG.grafoMalla(25, 20, dirigido=False)
 
 
 
+
+
 # #crear .dot
 
-bfs_G_malla30 = G_malla30.BFS(0)
-bfs_G_malla30.guardar_grafo('./grafosMallaBFS/Grafo_Malla_Nodos=30_No_Dirigido_m=6_n=5.dot')
+# bfs_G_malla30 = G_malla30.BFS(0)
+# bfs_G_malla100 = G_malla100.BFS(0)
+# bfs_G_malla500 = G_malla500.BFS(0)
 
-bfs_G_malla100 = G_malla100.BFS(0)
-bfs_G_malla100.guardar_grafo('./grafosMallaBFS/Grafo_Malla_Nodos=100_No_Dirigido_m=10_n=10.dot')
+bfs_G_ErdosRenyi30 = G_ErdosRenyi30.BFS(0)
+bfs_G_ErdosRenyi100 = G_ErdosRenyi100.BFS(0)
+bfs_G_ErdosRenyi500 = G_ErdosRenyi500.BFS(0)
 
-bfs_G_malla500 = G_malla500.BFS(0)
-bfs_G_malla500.guardar_grafo('./grafosMallaBFS/Grafo_Malla_Nodos=500_No_Dirigido_m=25_n=20.dot')
+# bfs_G_malla30.guardar_grafo('./BFS/grafosMallaBFS/Grafo_Malla_Nodos=30_No_Dirigido_m=6_n=5.dot')
+# bfs_G_malla100.guardar_grafo('./BFS/grafosMallaBFS/Grafo_Malla_Nodos=100_No_Dirigido_m=10_n=10.dot')
+# bfs_G_malla500.guardar_grafo('./BFS/grafosMallaBFS/Grafo_Malla_Nodos=500_No_Dirigido_m=25_n=20.dot')
 
-# G_ErdosRenyi50.guardar_grafo('./grafosErdosRenyi/Grafo_ErdosRenyi_Nodos=50_No_Dirigido_n=50_m=130.dot')
-# G_ErdosRenyi200.guardar_grafo('./grafosErdosRenyi/Grafo_ErdosRenyi_Nodos=200_No_Dirigido_n=200_m=600.dot')
-# G_ErdosRenyi500.guardar_grafo('./grafosErdosRenyi/Grafo_ErdosRenyi_Nodos=500_No_Dirigido_n=500_m=1450.dot')
+bfs_G_ErdosRenyi30.guardar_grafo('./BFS/grafosErdosRenyiBFS/Grafo_ErdosRenyi_Nodos=30_No_Dirigido_n=30_m=130.dot')
+bfs_G_ErdosRenyi100.guardar_grafo('./BFS/grafosErdosRenyiBFS/Grafo_ErdosRenyi_Nodos=100_No_Dirigido_n=100_m=600.dot')
+bfs_G_ErdosRenyi500.guardar_grafo('./BFS/grafosErdosRenyiBFS/Grafo_ErdosRenyi_Nodos=500_No_Dirigido_n=500_m=1450.dot')
 
 # G_grafoGilbert50.guardar_grafo('./grafosGilbert/Grafo_Gilbert_Nodos=50_No_Dirigido_n=50_p=0.7.dot')
 # G_grafoGilbert200.guardar_grafo('./grafosGilbert/Grafo_Gilbert_Nodos=200_No_Dirigido_n=200_p=0.1.dot')
