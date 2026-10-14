@@ -157,7 +157,7 @@ class Grafo:
             visit[x] = True
             if padre is not None:
                 G.agregar_arista(Arista(self.lista_nodos[padre], self.lista_nodos[x]))
-            for v in self.lista_adyacencia[x]:
+            for v in reversed(self.lista_adyacencia[x]):
                 if not visit[v.id]:
                     pila.append((v.id, x))
         return G
