@@ -119,6 +119,12 @@ class Grafo:
         return aristas
 
     def BFS(self, s):
+        """
+        Calcula el árbol inducido por el recorrido en anchura (BFS).
+
+        :param s: id del nodo fuente
+        :return: Grafo con el árbol BFS (solo incluye la componente de s)
+        """
         G = Grafo(self.n, False)
         q = deque([s])
         visit = [False for _ in range(self.n)]
@@ -133,6 +139,13 @@ class Grafo:
         return G
 
     def DFS_R(self, s):
+        """
+        Calcula el árbol inducido por el recorrido en profundidad (DFS)
+        de forma recursiva.
+
+        :param s: id del nodo fuente
+        :return: Grafo con el árbol DFS
+        """
         G = Grafo(self.n, False)
         visit = [False for _ in range(self.n)]
         visit[s] = True
@@ -140,6 +153,13 @@ class Grafo:
         return G
 
     def _DFS_R_(self, x, visit, G):
+        """
+        Paso recursivo auxiliar de DFS_R.
+
+        :param x: id del nodo actual
+        :param visit: lista de nodos ya visitados
+        :param arbol: Grafo donde se van agregando las aristas del árbol
+        """
         for v in self.lista_adyacencia[x]:
             if not visit[v.id]:
                 visit[v.id] = True
@@ -147,6 +167,12 @@ class Grafo:
                 self._DFS_R_(v.id, visit, G)
 
     def DFS_I(self, s):
+        """
+        Calcula el árbol DFS de forma iterativa usando una pila explícita.
+
+        :param s: id del nodo fuente
+        :return: Grafo con el árbol DFS
+        """
         G = Grafo(self.n, False)
         visit = [False] * self.n
         pila = [(s, None)]
