@@ -6,9 +6,8 @@ exportarlos a formato GraphViz (.dot).
 
 from nodo import Nodo
 from arista import Arista
-import os
+import os, heapq
 from collections import deque
-
 import pydot
 
 class Grafo:
@@ -21,7 +20,7 @@ class Grafo:
     parámetro `dirigido` recibido en el constructor.
     """
 
-    def __init__(self, n:int, dirigido:bool=False):
+    def __init__(self, n:int, dirigido:bool=False, lista_nodos=None):
         """
         Inicializa la clase grafo.
  
@@ -36,7 +35,10 @@ class Grafo:
         self.n = n
         self.m = 0
         self.dirigido = dirigido
-        self.lista_nodos = [Nodo(i) for i in range(n)]
+        if lista_nodos == None:
+            self.lista_nodos = [Nodo(i) for i in range(n)]
+        else:
+            self.lista_nodos = lista_nodos
 
     def agregar_arista(self, e: Arista):
         """
@@ -49,9 +51,9 @@ class Grafo:
         :param e: arista a agregar, con nodo de origen (u) y
                   nodo de destino (v)
         """
-        self.lista_adyacencia[e.u.id].append(e.v)
+        self.lista_adyacencia[e.u.id].append( (e.weight, e.v) )
         if not self.dirigido:
-            self.lista_adyacencia[e.v.id].append(e.u)
+            self.lista_adyacencia[e.v.id].append( (e.weight , e.u) )
         self.m += 1
 
     def cant_aristas(self):
@@ -89,10 +91,10 @@ class Grafo:
 
         #Añadir todos los nodos (incluso aislados)
         for nodo in self.lista_nodos:
-                grafo_dot.add_node(pydot.Node(nodo.id))
+                grafo_dot.add_node(pydot.Node(nodo.id, label=f'"{nodo.name}"' ))
 
         for e in self.obtener_aristas():
-            grafo_dot.add_edge(pydot.Edge(e.u.id, e.v.id))
+            grafo_dot.add_edge(pydot.Edge(e.u.id, e.v.id, label=str(e.weight)))
 
         grafo_dot.write_raw(ruta)
 
@@ -111,79 +113,50 @@ class Grafo:
         """
         aristas = []
         for i in range(self.n):
-            for nod in self.lista_adyacencia[i]:
+            for w, nod in self.lista_adyacencia[i]:
                 if self.dirigido:
-                    aristas.append(Arista(self.lista_nodos[i], nod))
+                    aristas.append(Arista(self.lista_nodos[i], nod, w))
                 elif nod.id > i:
-                    aristas.append(Arista(self.lista_nodos[i], nod))
+                    aristas.append(Arista(self.lista_nodos[i], nod, w))
         return aristas
 
-    def BFS(self, s):
-        """
-        Calcula el árbol inducido por el recorrido en anchura (BFS).
-
-        :param s: id del nodo fuente
-        :return: Grafo con el árbol BFS (solo incluye la componente de s)
-        """
-        G = Grafo(self.n, False)
-        q = deque([s])
-        visit = [False for _ in range(self.n)]
-        visit[s] = True
-        while len(q) > 0:
-            u = q.popleft()
-            for v in self.lista_adyacencia[u]:
-                if not visit[v.id]:
-                    visit[v.id] = True
-                    q.append(v.id)
-                    G.agregar_arista(Arista(Nodo(u), v))
-        return G
-
-    def DFS_R(self, s):
-        """
-        Calcula el árbol inducido por el recorrido en profundidad (DFS)
-        de forma recursiva.
-
-        :param s: id del nodo fuente
-        :return: Grafo con el árbol DFS
-        """
-        G = Grafo(self.n, False)
-        visit = [False for _ in range(self.n)]
-        visit[s] = True
-        self._DFS_R_(s, visit, G)
-        return G
-
-    def _DFS_R_(self, x, visit, G):
-        """
-        Paso recursivo auxiliar de DFS_R.
-
-        :param x: id del nodo actual
-        :param visit: lista de nodos ya visitados
-        :param arbol: Grafo donde se van agregando las aristas del árbol
-        """
-        for v in self.lista_adyacencia[x]:
-            if not visit[v.id]:
-                visit[v.id] = True
-                G.agregar_arista(Arista(Nodo(x), v))
-                self._DFS_R_(v.id, visit, G)
-
-    def DFS_I(self, s):
-        """
-        Calcula el árbol DFS de forma iterativa usando una pila explícita.
-
-        :param s: id del nodo fuente
-        :return: Grafo con el árbol DFS
-        """
-        G = Grafo(self.n, False)
-        visit = [False] * self.n
-        pila = [(s, None)]
-        while pila:
-            x, padre = pila.pop()
-            if visit[x]:
+    def dijkstra(self, s:int):
+        INF = 1000000000000000000
+        dict_weight = {}
+        d = [INF for _ in range(self.n)]
+        pi = [-1 for _ in range(self.n)]
+        d[s] = 0
+        pq = []
+        heapq.heappush(pq, (0, s))
+        while pq:
+            dist, cur = heapq.heappop(pq)
+            if dist > d[cur]:
                 continue
-            visit[x] = True
-            if padre is not None:
-                G.agregar_arista(Arista(self.lista_nodos[padre], self.lista_nodos[x]))
-            for v in reversed(self.lista_adyacencia[x]):
-                if not visit[v.id]:
-                    pila.append((v.id, x))
+            cnt = len(self.lista_adyacencia[cur])
+            for i in range(cnt):
+                (w, node) = self.lista_adyacencia[cur][i]
+                u = node.id
+                if d[u] > d[cur] + w:
+                    d[u] = d[cur] + w
+                    pi[u] = cur
+                    dict_weight[ (cur, u) ] = w
+                    dict_weight[ (u, cur) ] = w
+                    heapq.heappush(pq, (d[u], u))
+
+        nodeList = [ None for i in range(self.n) ]
+
+        for i in range(self.n):
+            distanceLabel = 'INF'
+            if d[i]!=INF:
+                distanceLabel = f"({d[i]:.2f})"
+            nodeList[i] = Nodo(i, name=f"nodo_{i} {distanceLabel}")
+
+        G = Grafo(self.n, False, nodeList)
+
+        for i in range(self.n):
+            if pi[i] != -1:
+                parent = pi[i]
+                weight = dict_weight[(i, parent)]
+                G.agregar_arista( Arista( nodeList[i], nodeList[parent], weight ) )
+
         return G

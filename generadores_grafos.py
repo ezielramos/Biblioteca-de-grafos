@@ -35,9 +35,9 @@ class Generador_Grafo:
             y = Nodo(i + 1)
             z = Nodo(i + m)
             if i % m != m - 1:
-                G.agregar_arista(Arista(x, y))
+                G.agregar_arista(Arista(x, y, weight = round(random.uniform(1, 100), 2) ))
             if i + m < orden:
-                G.agregar_arista(Arista(x, z))
+                G.agregar_arista(Arista(x, z, weight = round(random.uniform(1, 100), 2) ))
         return G
 
     def grafoErdosRenyi(self, n, m, dirigido=False):
@@ -61,7 +61,7 @@ class Generador_Grafo:
         for e in aristas_uniformes:
             nodo1 = Nodo(e[0])
             nodo2 = Nodo(e[1])
-            arista = Arista(nodo1, nodo2)
+            arista = Arista(nodo1, nodo2, weight = round(random.uniform(1, 100), 2) )
             G.agregar_arista(arista)
         return G
 
@@ -80,7 +80,7 @@ class Generador_Grafo:
                 nodo1 = nodos[i]
                 nodo2 = nodos[j]
                 if random.random() < p:
-                    G.agregar_arista(Arista(Nodo(nodo1), Nodo(nodo2)))
+                    G.agregar_arista(Arista(Nodo(nodo1), Nodo(nodo2), weight = round(random.uniform(1, 100), 2) ))
         return G
 
     def grafoGeografico(self, n, r, dirigido=False):
@@ -101,7 +101,7 @@ class Generador_Grafo:
                 y_j = coordenadas[j][1]
                 distancia = ((x_i - x_j) ** 2 + (y_i - y_j) ** 2) ** 0.5
                 if distancia <= r:
-                    G.agregar_arista(Arista(Nodo(i), Nodo(j)))
+                    G.agregar_arista(Arista(Nodo(i), Nodo(j), weight = round(random.uniform(1, 100), 2) ))
         return G
 
     def grafoBarabasiAlbert(self, n, d, dirigido=False):
@@ -118,7 +118,7 @@ class Generador_Grafo:
 
         for i in range(d - 1):
             for j in range(i + 1, d):
-                G.agregar_arista(Arista(Nodo(i), Nodo(j)))
+                G.agregar_arista(Arista(Nodo(i), Nodo(j), weight = round(random.uniform(1, 100), 2)  ))
                 lista_frecuencia_vertices.append(i)
                 lista_frecuencia_vertices.append(j)
                 grado[i] += 1
@@ -129,7 +129,7 @@ class Generador_Grafo:
             adyacentes = set(random.sample(lista_frecuencia_vertices, k))
             lista_frecuencia_vertices.append(i)
             for ady in adyacentes:
-                G.agregar_arista(Arista(Nodo(i), Nodo(ady)))
+                G.agregar_arista(Arista(Nodo(i), Nodo(ady), weight = round(random.uniform(1, 100), 2)  ))
                 grado[i] += 1
                 grado[ady] += 1
                 lista_frecuencia_vertices.append(i)
@@ -150,17 +150,17 @@ class Generador_Grafo:
         """
         G = Grafo(n, dirigido)
 
-        G.agregar_arista(Arista(Nodo(0), Nodo(1)))
-        G.agregar_arista(Arista(Nodo(0), Nodo(2)))
-        G.agregar_arista(Arista(Nodo(1), Nodo(2)))
+        G.agregar_arista(Arista(Nodo(0), Nodo(1), weight = round(random.uniform(1, 100), 2) ))
+        G.agregar_arista(Arista(Nodo(0), Nodo(2), weight = round(random.uniform(1, 100), 2) ))
+        G.agregar_arista(Arista(Nodo(1), Nodo(2), weight = round(random.uniform(1, 100), 2) ))
         lista_aristas = [(0,1), (0,2), (1,2)]
 
         for i in range(3, n):
             e = random.sample(lista_aristas, 1)[0]
             nod1 = e[0]
             nod2 = e[1]
-            G.agregar_arista(Arista(Nodo(i), Nodo(nod1)))
-            G.agregar_arista(Arista(Nodo(i), Nodo(nod2)))
+            G.agregar_arista(Arista(Nodo(i), Nodo(nod1), weight = round(random.uniform(1, 100), 2)  ))
+            G.agregar_arista(Arista(Nodo(i), Nodo(nod2), weight = round(random.uniform(1, 100), 2) ))
             lista_aristas.append((i, nod1))
             lista_aristas.append((i, nod2))
 

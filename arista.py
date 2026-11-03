@@ -14,12 +14,14 @@ class Arista:
     dirigido, la arista representa una conexión simétrica entre `u`
     y `v`.
     """
-    def __init__(self, u:Nodo, v:Nodo):
+    def __init__(self, u:Nodo, v:Nodo, weight:float=1.0):
         """
         Inicializa una arista entre dos nodos.
  
         :param u: nodo de origen de la arista
         :param v: nodo de destino de la arista
+        :param weight: peso de la arista
         """
         self.u = u
         self.v = v
+        self.weight = weight
