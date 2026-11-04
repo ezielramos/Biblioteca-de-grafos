@@ -121,6 +121,20 @@ class Grafo:
         return aristas
 
     def dijkstra(self, s:int):
+        """
+        Calcula el árbol de caminos más cortos desde un nodo fuente
+        usando el algoritmo de Dijkstra con cola de prioridad (heapq).
+
+        Devuelve un nuevo Grafo con los mismos n nodos y solo las
+        aristas del árbol (con su peso original). Cada nodo se renombra
+        con su distancia al origen, por ejemplo "nodo_2 (22.45)". Los
+        nodos inalcanzables (grafo no conexo) quedan aislados y se
+        etiquetan "nodo_i INF". Requiere pesos no negativos.
+        Complejidad: O((n + m) log n).
+
+        :param s: id del nodo fuente
+        :return: Grafo con el árbol de caminos más cortos
+        """
         INF = 1000000000000000000
         dict_weight = {}
         d = [INF for _ in range(self.n)]

@@ -1,33 +1,29 @@
 # Biblioteca de Grafos en Python
 
-Biblioteca orientada a objetos, escrita en Python 3, para describir,
-generar y recorrer grafos. Incluye clases básicas (`Nodo`, `Arista`,
-`Grafo`), un generador (`Generador_Grafo`) con seis modelos de
-generación de grafos, los algoritmos de recorrido **BFS** y **DFS**
-(recursivo e iterativo) que calculan el árbol inducido a partir de un
-nodo fuente, y un método para exportar cualquier grafo a formato
-GraphViz (`.dot`).
+Biblioteca orientada a objetos, escrita en Python 3, para describir, generar y
+analizar grafos ponderados. Incluye las clases `Nodo`, `Arista` y `Grafo`, un
+generador (`Generador_Grafo`) con seis modelos, el algoritmo de **Dijkstra**
+para calcular el árbol de caminos más cortos desde un nodo fuente, y la
+exportación a formato GraphViz (`.dot`).
 
 - **Proyecto 1:** clases básicas, modelos de generación y exportación a `.dot`.
-- **Proyecto 2:** algoritmos BFS, DFS recursivo y DFS iterativo.
+- **Proyecto 3:** pesos en las aristas y algoritmo de Dijkstra.
 
-## Estructura del proyecto
+## Estructura
 
 ```
 .
 ├── nodo.py                   # Clase Nodo
-├── arista.py                 # Clase Arista
-├── grafo.py                  # Clase Grafo (estructura, BFS, DFS, exportación a .dot)
-├── generadores_grafos.py     # Clase Generador_Grafo (los 6 modelos)
-├── main.py                   # Genera los grafos, calcula BFS/DFS y guarda los .dot
-├── requirements.txt          # Dependencias del proyecto
+├── arista.py                 # Clase Arista (con peso)
+├── grafo.py                  # Clase Grafo (estructura, Dijkstra, exportación .dot)
+├── generadores_grafos.py     # Clase Generador_Grafo (6 modelos)
+├── main.py                   # Genera grafos, calcula Dijkstra y guarda los .dot
+├── requirements.txt
 ├── README.md
-└── Proyecto_2_archivos/      # Archivos de salida (ver "Archivos generados")
+└── Proyecto_3_archivos/
     ├── grafosMalla/
-    │   ├── Grafo_Malla_*.dot          # grafos generados (30, 100, 500 nodos)
-    │   ├── BFS/                       # árboles BFS
-    │   ├── DFS_R/                     # árboles DFS recursivo
-    │   └── DFS_I/                     # árboles DFS iterativo
+    │   ├── Grafo_Malla_*.dot          # grafos generados (30 y 500 nodos)
+    │   └── dijkstra/                  # árboles de caminos más cortos
     ├── grafosErdosRenyi/              # misma estructura
     ├── grafosGilbert/                 # misma estructura
     ├── grafosGeografico/              # misma estructura
@@ -35,10 +31,13 @@ GraphViz (`.dot`).
     └── grafosDorogovtsevMendes/       # misma estructura
 ```
 
-## Requisitos e instalación
+Cada carpeta contiene, además de los `.dot`, las imágenes de visualización
+(PNG, SVG y PDF) de cada grafo generado y calculado.
 
-- Python 3.6
-- Dependencias listadas en `requirements.txt` (principalmente [`pydot`](https://pypi.org/project/pydot/) para exportar a formato GraphViz)
+## Instalación
+
+- Python 3.6+
+- Dependencias en `requirements.txt` (`pydot`, `pyparsing`).
 
 ```bash
 pip install -r requirements.txt
@@ -47,132 +46,106 @@ pip install -r requirements.txt
 ## Uso rápido
 
 ```python
-from grafo import Grafo
-from nodo import Nodo
-from arista import Arista
-
-G = Grafo(4)                              # grafo no dirigido de 4 nodos
-G.agregar_arista(Arista(Nodo(0), Nodo(1)))
-G.agregar_arista(Arista(Nodo(1), Nodo(2)))
-
-print(G.orden())          # 4
-print(G.cant_aristas())   # 2
-
-G.guardar_grafo("salida/mi_grafo.dot")
-```
-
-### Generar un grafo con un modelo aleatorio
-
-```python
 from generadores_grafos import Generador_Grafo
 
 GG = Generador_Grafo()
-G = GG.grafoGilbert(n=50, p=0.1, dirigido=False)
-G.guardar_grafo("salida/grafo_gilbert.dot")
+G = GG.grafoErdosRenyi(30, 130)
+
+arbol = G.dijkstra(0)          # árbol de caminos más cortos desde el nodo 0
+G.guardar_grafo("salida/grafo.dot")
+arbol.guardar_grafo("salida/dijkstra.dot")
 ```
 
-### Calcular el árbol BFS o DFS de un grafo
+## Pesos de las aristas
+
+Todos los generadores asignan a cada arista un peso aleatorio uniforme en
+[1, 100] con dos decimales (`round(random.uniform(1, 100), 2)`). Los pesos se
+escriben en el `.dot` como `label` de cada arista.
+
+## Dijkstra
+
+`Grafo.dijkstra(s)` recibe el id del nodo fuente `s` y devuelve un nuevo
+`Grafo` que contiene el **árbol de caminos más cortos** desde `s`.
+
+- Usa una cola de prioridad (`heapq`); complejidad `O((n + m) log n)`.
+- Requiere pesos no negativos.
+- El grafo resultante conserva los `n` nodos; cada nodo se renombra con su
+  distancia al origen: `nodo_2 (22.45)`.
+- Las aristas del árbol conservan su peso original.
+- Si el grafo no es conexo, los nodos inalcanzables quedan aislados y se
+  etiquetan `nodo_i INF`.
 
 ```python
-from generadores_grafos import Generador_Grafo
-
-GG = Generador_Grafo()
-G = GG.grafoErdosRenyi(30, 60)
-
-arbol_bfs = G.BFS(0)       # árbol inducido por BFS desde el nodo 0
-arbol_dfs_r = G.DFS_R(0)   # árbol inducido por DFS recursivo
-arbol_dfs_i = G.DFS_I(0)   # árbol inducido por DFS iterativo
-
-arbol_bfs.guardar_grafo("salida/bfs.dot")
+arbol = G.dijkstra(0)
+# nodo_0 (0.00), nodo_1 (19.00), nodo_2 (34.00), ...
 ```
 
-Cada método devuelve un nuevo objeto `Grafo` con los mismos nodos que el
-original y únicamente las aristas del árbol. Si el grafo no es conexo,
-el árbol cubre solo la componente conexa del nodo fuente `s`; el resto
-de los nodos quedan aislados.
+### Ejemplo: malla de 30 nodos (fuente `nodo_0`)
 
-## Ejecutar el script principal (`main.py`)
+| Grafo generado | Árbol de Dijkstra |
+|---|---|
+| ![Malla 30](Proyecto_3_archivos/grafosMalla/Grafo_Malla_Nodos%3D30_No_Dirigido_m%3D6_n%3D5.png) | ![Dijkstra malla 30](Proyecto_3_archivos/grafosMalla/dijkstra/dijkstra_Grafo_Malla_Nodos%3D30_No_Dirigido_m%3D6_n%3D5.png) |
+
+## Ejecutar `main.py`
 
 ```bash
 python main.py
 ```
 
-`main.py` realiza lo siguiente:
+1. Genera **12 grafos**: 6 modelos × 2 tamaños (30 nodos "pocos" y 500 nodos "muchos").
+2. Calcula el árbol de Dijkstra de cada uno con nodo fuente `0` (12 árboles).
+3. Guarda los 24 grafos como `.dot` en `Proyecto_3_archivos/`.
 
-1. Genera **18 grafos**: 6 modelos × 3 tamaños (30, 100 y 500 nodos).
-2. Calcula, para cada grafo generado, **3 árboles** a partir del nodo `0`: uno BFS, uno DFS recursivo (`DFS_R`) y uno DFS iterativo (`DFS_I`), es decir, **54 árboles**.
-3. Guarda los 72 grafos como archivos `.dot` dentro de `Proyecto_2_archivos/`, en una carpeta por modelo y una subcarpeta por algoritmo (`BFS`, `DFS_R`, `DFS_I`).
-
-| Tamaño | Malla (`m` × `n`) |
-|---|---|
-| 30 nodos | 6 × 5 |
-| 100 nodos | 10 × 10 |
-| 500 nodos | 25 × 20 |
+| Modelo | 30 nodos | 500 nodos |
+|---|---|---|
+| Malla | `m=6, n=5` | `m=25, n=20` |
+| Erdős–Rényi | `n=30, m=130` | `n=500, m=2000` |
+| Gilbert | `n=30, p=0.7` | `n=500, p=0.3` |
+| Geográfico simple | `n=30, r=0.5` | `n=500, r=0.2` |
+| Barabási–Albert | `n=30, d=4` | `n=500, d=300` |
+| Dorogovtsev–Mendes | `n=30` | `n=500` |
 
 ## Clases
 
 | Clase | Descripción |
 |---|---|
-| `Nodo` | Representa un vértice, identificado por un `id` entero y un `name` opcional. |
-| `Arista` | Representa una conexión entre dos nodos `u` y `v`. |
-| `Grafo` | Estructura principal: guarda una lista de adyacencia, permite agregar aristas, consultar orden/tamaño, calcular árboles BFS/DFS y exportar a `.dot`. |
-| `Generador_Grafo` | Agrupa los algoritmos que construyen instancias de `Grafo` según distintos modelos. |
+| `Nodo` | Vértice con `id` entero y `name` opcional. |
+| `Arista` | Conexión entre `u` y `v` con `weight`. |
+| `Grafo` | Lista de adyacencia de pares `(peso, nodo)`; agrega aristas, calcula Dijkstra y exporta a `.dot`. |
+| `Generador_Grafo` | Construye grafos según distintos modelos. |
 
-### Métodos principales de `Grafo`
+### Métodos de `Grafo`
 
 | Método | Descripción |
 |---|---|
-| `agregar_arista(e: Arista)` | Agrega una arista al grafo (en ambos sentidos si no es dirigido). |
-| `cant_aristas()` | Devuelve el número de aristas del grafo. |
-| `orden()` | Devuelve el número de nodos del grafo. |
-| `obtener_aristas()` | Devuelve la lista de aristas, sin duplicados en el caso no dirigido. |
-| `guardar_grafo(ruta: str)` | Exporta el grafo a un archivo `.dot` (formato GraphViz). |
-| `BFS(s)` | Devuelve el árbol inducido por el recorrido en anchura (BFS) desde el nodo fuente `s`. |
-| `DFS_R(s)` | Devuelve el árbol inducido por el recorrido en profundidad (DFS) de forma recursiva desde `s`. |
-| `DFS_I(s)` | Devuelve el árbol inducido por el recorrido en profundidad (DFS) de forma iterativa, con pila explícita, desde `s`. |
+| `agregar_arista(e)` | Agrega una arista (en ambos sentidos si no es dirigido). |
+| `cant_aristas()` | Número de aristas. |
+| `orden()` | Número de nodos. |
+| `obtener_aristas()` | Lista de aristas sin duplicados (caso no dirigido). |
+| `guardar_grafo(ruta)` | Exporta a `.dot` con nombres de nodo y pesos de arista. |
+| `dijkstra(s)` | Árbol de caminos más cortos desde `s`, con distancias en los nombres de nodo. |
 
-## Algoritmos de recorrido
-
-| Algoritmo | Estructura auxiliar | Descripción |
-|---|---|---|
-| `BFS(s)` | Cola | Visita los nodos por niveles. Cada nodo nuevo se agrega al árbol con la arista del nodo que lo descubrió. |
-| `DFS_R(s)` | Pila de llamadas (recursión) | Se adentra lo más posible por cada rama antes de retroceder. |
-| `DFS_I(s)` | Pila explícita | Misma idea que `DFS_R`, sin recursión, por lo que no depende del límite de recursión de Python. |
-
-Los tres métodos tienen complejidad $O(n + m)$ y devuelven un `Grafo`
-con `n` nodos y, como máximo, `n - 1` aristas.
-
-## Modelos de generación de grafos
+## Modelos de generación
 
 | Método | Modelo | Parámetros |
 |---|---|---|
-| `grafoMalla(m, n, dirigido)` | Malla / grid de `m` columnas × `n` filas | `m, n > 1` |
-| `grafoErdosRenyi(n, m, dirigido)` | Erdős–Rényi $G_{n,m}$: `n` nodos y `m` aristas elegidas uniformemente al azar | `n > 0`, `m >= n-1` |
-| `grafoGilbert(n, p, dirigido)` | Gilbert $G_{n,p}$: `n` nodos, cada par conectado con probabilidad `p` | `n > 0`, `0 < p < 1` |
-| `grafoGeografico(n, r, dirigido)` | Geográfico simple $G_{n,r}$: `n` nodos en el plano unitario, conectados si su distancia es ≤ `r` | `n > 0`, `0 < r < 1` |
-| `grafoBarabasiAlbert(n, d, dirigido)` | Barabási–Albert (variante de grado máximo): los primeros `d` nodos forman un grafo completo; cada nodo nuevo se conecta preferencialmente a nodos de mayor grado | `n > 0`, `d > 1` |
-| `grafoDorogovtsevMendes(n, dirigido)` | Dorogovtsev–Mendes: inicia con un triángulo; cada nodo nuevo se conecta a los extremos de una arista elegida al azar | `n >= 3` |
+| `grafoMalla(m, n, dirigido)` | Malla de `m` columnas × `n` filas | `m, n > 1` |
+| `grafoErdosRenyi(n, m, dirigido)` | `n` nodos y `m` aristas al azar | `n > 0` |
+| `grafoGilbert(n, p, dirigido)` | Cada par se conecta con probabilidad `p` | `0 < p < 1` |
+| `grafoGeografico(n, r, dirigido)` | Nodos en el plano unitario, conectados si distancia ≤ `r` | `0 < r < 1` |
+| `grafoBarabasiAlbert(n, d, dirigido)` | Conexión preferencial con grado máximo `d` | `d > 1` |
+| `grafoDorogovtsevMendes(n, dirigido)` | Inicia con un triángulo; cada nodo nuevo se une a los extremos de una arista al azar | `n >= 3` |
 
-Todos los métodos aceptan el parámetro `dirigido` (por defecto
-`False`) y devuelven una instancia de `Grafo`.
+## Visualización
 
-## Formato de salida (.dot)
+Los `.dot` se importan en [Gephi](https://gephi.org/) (tipo *Undirected*).
+Recomendado: ForceAtlas 2 con *Prevent Overlap* y *Edge Weight Influence = 0*,
+luego *Label Adjust*. En Preview se exporta PNG/SVG/PDF; para los grafos de 500
+nodos el SVG/PDF permite hacer zoom hasta leer cada distancia.
 
-`Grafo.guardar_grafo()` escribe el grafo en formato
-[GraphViz](https://graphviz.org/) (texto plano `.dot`), usando `graph`
-y `--` para grafos no dirigidos, y `digraph` y `->` para grafos
-dirigidos. Estos archivos se pueden:
-
-- Abrir e importar en [Gephi](https://gephi.org/) para explorarlos y generar las imágenes de visualización.
-
-## Nomenclatura de los archivos
-
-Los nombres de archivo incluyen el modelo, el tamaño y los parámetros
-usados, por ejemplo:
+## Nomenclatura de archivos
 
 ```
-Grafo_Gilbert_Nodos=100_No_Dirigido_n=100_p=0.5.dot          # grafo generado
-BFS_Grafo_Gilbert_Nodos=100_No_Dirigido_n=100_p=0.5.dot      # árbol BFS
-DFS_Grafo_Gilbert_Nodos=100_No_Dirigido_n=100_p=0.5.dot      # árbol DFS recursivo
-DFS_I_Grafo_Gilbert_Nodos=100_No_Dirigido_n=100_p=0.5.dot    # árbol DFS iterativo
+Grafo_Gilbert_Nodos=500_No_Dirigido_n=500_p=0.3.dot            # grafo generado
+dijkstra_Grafo_Gilbert_Nodos=500_No_Dirigido_n=500_p=0.3.dot   # árbol de Dijkstra
 ```
