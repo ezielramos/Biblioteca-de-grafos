@@ -1,13 +1,8 @@
-# Biblioteca de Grafos en Python
+# Proyecto 4 - Algoritmos de Kruskal y Prim
 
-Biblioteca orientada a objetos, escrita en Python 3, para describir, generar y
-analizar grafos ponderados. Incluye las clases `Nodo`, `Arista` y `Grafo`, un
-generador (`Generador_Grafo`) con seis modelos, el algoritmo de **Dijkstra**
-para calcular el árbol de caminos más cortos desde un nodo fuente, y la
-exportación a formato GraphViz (`.dot`).
-
-- **Proyecto 1:** clases básicas, modelos de generación y exportación a `.dot`.
-- **Proyecto 3:** pesos en las aristas y algoritmo de Dijkstra.
+Implementación, sobre la biblioteca de grafos del Proyecto 1, de los algoritmos
+**Kruskal directo**, **Kruskal inverso** y **Prim** para calcular el árbol de
+expansión mínima (MST) de grafos ponderados no dirigidos.
 
 ## Estructura
 
@@ -15,20 +10,24 @@ exportación a formato GraphViz (`.dot`).
 .
 ├── nodo.py                   # Clase Nodo
 ├── arista.py                 # Clase Arista (con peso)
-├── grafo.py                  # Clase Grafo (estructura, Dijkstra, exportación .dot)
+├── grafo.py                  # Clase Grafo (Prim, KruskalD, KruskalI, exportación .dot)
+├── helper.py                 # Clase DSU (Union-Find) usada por KruskalD
 ├── generadores_grafos.py     # Clase Generador_Grafo (6 modelos)
-├── main.py                   # Genera grafos, calcula Dijkstra y guarda los .dot
+├── main.py                   # Genera grafos, calcula los MST y guarda los .dot
 ├── requirements.txt
 ├── README.md
-└── Proyecto_3_archivos/
+└── Proyecto_4_archivos/
     ├── grafosMalla/
-    │   ├── Grafo_Malla_*.dot          # grafos generados (30 y 500 nodos)
-    │   └── dijkstra/                  # árboles de caminos más cortos
+    │   ├── Grafo_Malla_*.dot          # grafos generados (30 y 400 nodos)
+    │   ├── prim/                      # MST con Prim
+    │   ├── KruskalD/                  # MST con Kruskal directo
+    │   └── KruskalI/                  # MST con Kruskal inverso
     ├── grafosErdosRenyi/              # misma estructura
     ├── grafosGilbert/                 # misma estructura
     ├── grafosGeografico/              # misma estructura
     ├── grafosBarabasiAlbert/          # misma estructura
-    └── grafosDorogovtsevMendes/       # misma estructura
+    ├── grafosDorogovtsevMendes/       # misma estructura
+    └── capturas/                      # capturas de pantalla con el valor del MST
 ```
 
 Cada carpeta contiene, además de los `.dot`, las imágenes de visualización
@@ -51,40 +50,74 @@ from generadores_grafos import Generador_Grafo
 GG = Generador_Grafo()
 G = GG.grafoErdosRenyi(30, 130)
 
-arbol = G.dijkstra(0)          # árbol de caminos más cortos desde el nodo 0
+peso_prim, mst_prim = G.Prim()
+peso_kd,   mst_kd   = G.KruskalD()
+peso_ki,   mst_ki   = G.KruskalI()
+
+print(peso_prim, peso_kd, peso_ki)   # los tres valores coinciden
+
 G.guardar_grafo("salida/grafo.dot")
-arbol.guardar_grafo("salida/dijkstra.dot")
+mst_prim.guardar_grafo("salida/prim.dot")
 ```
 
-## Pesos de las aristas
+## Árbol de expansión mínima (MST)
 
-Todos los generadores asignan a cada arista un peso aleatorio uniforme en
-[1, 100] con dos decimales (`round(random.uniform(1, 100), 2)`). Los pesos se
-escriben en el `.dot` como `label` de cada arista.
+Dado un grafo no dirigido, conexo y ponderado, un **árbol de expansión mínima**
+es un subconjunto de `n - 1` aristas que conecta todos los nodos, no contiene
+ciclos y tiene el menor peso total posible. Los tres métodos devuelven una
+tupla `(peso_total, grafo_mst)`, donde `grafo_mst` es un nuevo `Grafo` con los
+mismos `n` nodos y solo las aristas del árbol.
 
-## Dijkstra
+Los pesos de las aristas son aleatorios uniformes en [1, 100] con dos decimales
+y se escriben en el `.dot` como `label` de cada arista.
 
-`Grafo.dijkstra(s)` recibe el id del nodo fuente `s` y devuelve un nuevo
-`Grafo` que contiene el **árbol de caminos más cortos** desde `s`.
+> Si el grafo no es conexo, los algoritmos devuelven un bosque de expansión
+> mínima (menos de `n - 1` aristas).
 
-- Usa una cola de prioridad (`heapq`); complejidad `O((n + m) log n)`.
-- Requiere pesos no negativos.
-- El grafo resultante conserva los `n` nodos; cada nodo se renombra con su
-  distancia al origen: `nodo_2 (22.45)`.
-- Las aristas del árbol conservan su peso original.
-- Si el grafo no es conexo, los nodos inalcanzables quedan aislados y se
-  etiquetan `nodo_i INF`.
+### `Prim()`
 
-```python
-arbol = G.dijkstra(0)
-# nodo_0 (0.00), nodo_1 (19.00), nodo_2 (34.00), ...
-```
+Algoritmo **voraz** que hace crecer un único árbol a partir del nodo `0`.
 
-### Ejemplo: malla de 30 nodos (fuente `nodo_0`)
+1. Marca el nodo `0` como visitado y mete sus aristas en una cola de prioridad (`heapq`).
+2. Extrae la arista de menor peso. Si su extremo aún no pertenece al árbol, la agrega al MST, marca el nodo y encola sus aristas.
+3. Repite hasta tener `n - 1` aristas o hasta que la cola se vacíe.
 
-| Grafo generado | Árbol de Dijkstra |
-|---|---|
-| ![Malla 30](Proyecto_3_archivos/grafosMalla/Grafo_Malla_Nodos%3D30_No_Dirigido_m%3D6_n%3D5.png) | ![Dijkstra malla 30](Proyecto_3_archivos/grafosMalla/dijkstra/dijkstra_Grafo_Malla_Nodos%3D30_No_Dirigido_m%3D6_n%3D5.png) |
+La propiedad de corte garantiza que la arista más ligera que sale del árbol
+actual siempre pertenece a algún MST. Complejidad: `O(m log m)` (equivalente a `O(m log n)`).
+
+### `KruskalD()` (Kruskal directo)
+
+Algoritmo **voraz** que construye un bosque que se va fusionando.
+
+1. Obtiene las aristas con `obtener_aristas()` y las ordena de menor a mayor peso.
+2. Recorre las aristas en ese orden. Usa una estructura **Union-Find (DSU)** con compresión de caminos y unión por tamaño (`helper.py`) para saber si los extremos están en componentes distintas.
+3. Si lo están, une las componentes y agrega la arista al MST; si no, la descarta porque formaría un ciclo.
+4. Termina al tener `n - 1` aristas.
+
+Complejidad: `O(m log m)`, dominada por el ordenamiento.
+
+### `KruskalI()` (Kruskal inverso / *reverse-delete*)
+
+Parte del grafo completo y **elimina** aristas.
+
+1. Copia el grafo en una lista de adyacencia auxiliar y ordena las aristas de mayor a menor peso.
+2. Para cada arista, la quita temporalmente y ejecuta un DFS desde uno de sus extremos.
+3. Si el otro extremo ya no es alcanzable (el grafo se desconectaría), la arista es un puente: se restaura y se agrega al MST. Si sigue siendo alcanzable, se elimina definitivamente.
+4. Termina al tener `n - 1` aristas.
+
+Complejidad: `O(m (n + m))` en esta implementación, mucho más lenta que las
+otras dos en grafos densos.
+
+### Comparación
+
+| Algoritmo | Estrategia | Estructura clave | Complejidad |
+|---|---|---|---|
+| `Prim` | Crece un solo árbol desde el nodo 0 | Cola de prioridad | `O(m log n)` |
+| `KruskalD` | Agrega aristas de menor a mayor sin formar ciclos | Union-Find (DSU) | `O(m log m)` |
+| `KruskalI` | Elimina aristas de mayor a menor si no desconectan | DFS | `O(m (n + m))` |
+
+Con aristas de pesos distintos el MST es único, por lo que los tres métodos
+deben reportar el mismo peso total.
 
 ## Ejecutar `main.py`
 
@@ -92,18 +125,18 @@ arbol = G.dijkstra(0)
 python main.py
 ```
 
-1. Genera **12 grafos**: 6 modelos × 2 tamaños (30 nodos "pocos" y 500 nodos "muchos").
-2. Calcula el árbol de Dijkstra de cada uno con nodo fuente `0` (12 árboles).
-3. Guarda los 24 grafos como `.dot` en `Proyecto_3_archivos/`.
+1. Genera **12 grafos**: 6 modelos × 2 tamaños (30 nodos "pocos" y 400 nodos "muchos").
+2. Calcula el MST de cada uno con `Prim`, `KruskalD` y `KruskalI` (36 árboles) e imprime en consola el peso total de cada uno (de ahí salen las capturas de pantalla del valor del MST).
+3. Guarda todos los grafos como `.dot` en `Proyecto_4_archivos/`.
 
-| Modelo | 30 nodos | 500 nodos |
+| Modelo | 30 nodos | 400 nodos |
 |---|---|---|
-| Malla | `m=6, n=5` | `m=25, n=20` |
-| Erdős–Rényi | `n=30, m=130` | `n=500, m=2000` |
-| Gilbert | `n=30, p=0.7` | `n=500, p=0.3` |
-| Geográfico simple | `n=30, r=0.5` | `n=500, r=0.2` |
-| Barabási–Albert | `n=30, d=4` | `n=500, d=300` |
-| Dorogovtsev–Mendes | `n=30` | `n=500` |
+| Malla | `m=6, n=5` | `m=20, n=20` |
+| Erdős–Rényi | `n=30, m=130` | `n=400, m=2000` |
+| Gilbert | `n=30, p=0.7` | `n=400, p=0.3` |
+| Geográfico simple | `n=30, r=0.5` | `n=400, r=0.2` |
+| Barabási–Albert | `n=30, d=4` | `n=400, d=300` |
+| Dorogovtsev–Mendes | `n=30` | `n=400` |
 
 ## Clases
 
@@ -111,7 +144,8 @@ python main.py
 |---|---|
 | `Nodo` | Vértice con `id` entero y `name` opcional. |
 | `Arista` | Conexión entre `u` y `v` con `weight`. |
-| `Grafo` | Lista de adyacencia de pares `(peso, nodo)`; agrega aristas, calcula Dijkstra y exporta a `.dot`. |
+| `Grafo` | Lista de adyacencia de pares `(peso, nodo)`; agrega aristas, calcula el MST y exporta a `.dot`. |
+| `DSU` | Union-Find con compresión de caminos (usado por `KruskalD`). |
 | `Generador_Grafo` | Construye grafos según distintos modelos. |
 
 ### Métodos de `Grafo`
@@ -123,7 +157,9 @@ python main.py
 | `orden()` | Número de nodos. |
 | `obtener_aristas()` | Lista de aristas sin duplicados (caso no dirigido). |
 | `guardar_grafo(ruta)` | Exporta a `.dot` con nombres de nodo y pesos de arista. |
-| `dijkstra(s)` | Árbol de caminos más cortos desde `s`, con distancias en los nombres de nodo. |
+| `Prim()` | MST con Prim. Devuelve `(peso_total, Grafo)`. |
+| `KruskalD()` | MST con Kruskal directo. Devuelve `(peso_total, Grafo)`. |
+| `KruskalI()` | MST con Kruskal inverso. Devuelve `(peso_total, Grafo)`. |
 
 ## Modelos de generación
 
@@ -140,12 +176,14 @@ python main.py
 
 Los `.dot` se importan en [Gephi](https://gephi.org/) (tipo *Undirected*).
 Recomendado: ForceAtlas 2 con *Prevent Overlap* y *Edge Weight Influence = 0*,
-luego *Label Adjust*. En Preview se exporta PNG/SVG/PDF; para los grafos de 500
-nodos el SVG/PDF permite hacer zoom hasta leer cada distancia.
+luego *Label Adjust*. En Preview se exporta PNG/SVG/PDF; para los grafos de 400
+nodos el SVG/PDF permite hacer zoom hasta leer cada peso.
 
 ## Nomenclatura de archivos
 
 ```
-Grafo_Gilbert_Nodos=500_No_Dirigido_n=500_p=0.3.dot            # grafo generado
-dijkstra_Grafo_Gilbert_Nodos=500_No_Dirigido_n=500_p=0.3.dot   # árbol de Dijkstra
+Grafo_Gilbert_Nodos=400_No_Dirigido_n=400_p=0.3.dot              # grafo generado
+prim_Grafo_Gilbert_Nodos=400_No_Dirigido_n=400_p=0.3.dot         # MST con Prim
+KruskalD_Grafo_Gilbert_Nodos=400_No_Dirigido_n=400_p=0.3.dot     # MST con Kruskal directo
+KruskalI_Grafo_Gilbert_Nodos=400_No_Dirigido_n=400_p=0.3.dot     # MST con Kruskal inverso
 ```
