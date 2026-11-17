@@ -177,6 +177,22 @@ class Grafo:
         return G
 
     def Prim(self):
+        """
+        Calcula el árbol de expansión mínima (MST) con el algoritmo de Prim.
+
+        Es un algoritmo voraz que hace crecer un único árbol a partir
+        del nodo 0. Mantiene una cola de prioridad (heapq) con las
+        aristas que salen del árbol actual. En cada paso extrae la de
+        menor peso; si su extremo aún no pertenece al árbol, agrega la
+        arista al MST, marca el nodo como visitado y encola sus aristas
+        vecinas. Se detiene al tener n - 1 aristas o al vaciarse la cola
+        (si el grafo no es conexo, devuelve un bosque).
+        Complejidad: O(m log m), equivalente a O(m log n).
+
+        :return: tupla (peso_total, Grafo) con el peso total del MST y
+                 un nuevo Grafo no dirigido que contiene solo las
+                 aristas del árbol
+        """
         mstEdges = []
         n = self.n
         m = 0
@@ -204,6 +220,22 @@ class Grafo:
             heapq.heappush(pq, (w, (node.id, x)))
 
     def KruskalD(self):
+        """
+        Calcula el árbol de expansión mínima (MST) con Kruskal directo.
+
+        Es un algoritmo voraz que construye un bosque que se va
+        fusionando. Ordena las aristas de menor a mayor peso y las
+        recorre en ese orden; usa una estructura Union-Find (DSU, ver
+        helper.py) para verificar si los extremos están en componentes
+        distintas. Si lo están, une las componentes y agrega la arista
+        al MST; si no, la descarta porque formaría un ciclo. Se detiene
+        al tener n - 1 aristas.
+        Complejidad: O(m log m), dominada por el ordenamiento.
+
+        :return: tupla (peso_total, Grafo) con el peso total del MST y
+                 un nuevo Grafo no dirigido que contiene solo las
+                 aristas del árbol
+        """
         mstEdges = []
         edges = [(e.weight, e.u.id, e.v.id) for e in self.obtener_aristas()]
         n = self.n
@@ -229,6 +261,22 @@ class Grafo:
                 self.dfs(neigh, visit, adj)
 
     def KruskalI(self):
+        """
+        Calcula el árbol de expansión mínima (MST) con Kruskal inverso
+        (algoritmo de borrado inverso o "reverse-delete").
+
+        Parte del grafo completo y ordena las aristas de mayor a menor
+        peso. Para cada arista la elimina temporalmente y ejecuta un DFS
+        desde uno de sus extremos: si el otro extremo ya no es alcanzable,
+        la arista es un puente (desconectaría el grafo), por lo que se
+        restaura y se agrega al MST; en caso contrario se elimina
+        definitivamente. Se detiene al tener n - 1 aristas.
+        Complejidad: O(m (n + m)), más lento que Prim y KruskalD.
+
+        :return: tupla (peso_total, Grafo) con el peso total del MST y
+                 un nuevo Grafo no dirigido que contiene solo las
+                 aristas del árbol
+        """
         mstEdges = []
         n = self.n
         edges = [(e.weight, e.u.id, e.v.id) for e in self.obtener_aristas()]
