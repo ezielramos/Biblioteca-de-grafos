@@ -8,6 +8,7 @@ from nodo import Nodo
 from arista import Arista
 import os, heapq
 from collections import deque
+from helper import DSU
 import pydot
 
 class Grafo:
@@ -161,7 +162,7 @@ class Grafo:
 
         for i in range(self.n):
             distanceLabel = 'INF'
-            if d[i]!=INF:
+            if d[i] != INF:
                 distanceLabel = f"({d[i]:.2f})"
             nodeList[i] = Nodo(i, name=f"nodo_{i} {distanceLabel}")
 
@@ -174,3 +175,92 @@ class Grafo:
                 G.agregar_arista( Arista( nodeList[i], nodeList[parent], weight ) )
 
         return G
+
+    def Prim(self):
+        mstEdges = []
+        n = self.n
+        m = 0
+        totalW = 0
+        mst = [False for i in range(n)]
+        mst[0] = True
+        pq = []
+        self.pushRange(pq, 0, self.lista_adyacencia[0])
+        while pq and m < n - 1:
+            dist, (cur, v) = heapq.heappop(pq)
+            if not mst[cur]:
+                m += 1
+                totalW += dist
+                mstEdges.append((dist, v, cur))
+                self.pushRange(pq, cur, self.lista_adyacencia[cur])
+            mst[cur] = True
+
+        G = Grafo(n, dirigido=False)
+        for w, x, y in mstEdges:
+            G.agregar_arista( Arista( Nodo(x), Nodo(y), weight = w) )
+        return totalW, G
+    
+    def pushRange(self, pq, x, neigh):
+        for (w, node) in neigh:
+            heapq.heappush(pq, (w, (node.id, x)))
+
+    def KruskalD(self):
+        mstEdges = []
+        edges = [(e.weight, e.u.id, e.v.id) for e in self.obtener_aristas()]
+        n = self.n
+        edges.sort()
+        dsu = DSU(n)
+        m, totalCost = 0, 0
+        for d, p1, p2 in edges:
+            if dsu.merge(p1, p2):
+                m += 1
+                totalCost += d
+                mstEdges.append( (d, p1, p2) )
+            if m == n - 1:
+                break
+        G = Grafo(n, dirigido=False)
+        for w, x, y in mstEdges:
+            G.agregar_arista( Arista( Nodo(x), Nodo(y), weight = w) )
+        return totalCost, G
+
+    def dfs(self, node, visit, adj):
+        visit[node] = True
+        for neigh in adj[node]:
+            if not visit[neigh]:
+                self.dfs(neigh, visit, adj)
+
+    def KruskalI(self):
+        mstEdges = []
+        n = self.n
+        edges = [(e.weight, e.u.id, e.v.id) for e in self.obtener_aristas()]
+
+        adj = [[] for _ in range(n)] ## adjacency list copy
+
+        for d, p1, p2 in edges:
+            adj[p1].append(p2)
+            adj[p2].append(p1)
+        
+        edges.sort(reverse = True)    # ordenar descendente
+
+        m, totalCost = 0, 0
+        for d, p1, p2 in edges:
+            ## remove edge
+            adj[p1].remove(p2)
+            adj[p2].remove(p1)
+            visit = [False for _ in range(n)]
+            self.dfs(p1, visit, adj)
+            if not visit[p2]:   ## if graph disconnected rollback
+                adj[p1].append(p2)
+                adj[p2].append(p1)
+                m += 1
+                totalCost += d
+                mstEdges.append( ( d, p1, p2 ) )
+            if m == n - 1:
+                break
+        G = Grafo(n, dirigido=False)
+        for w, x, y in mstEdges:
+            G.agregar_arista( Arista( Nodo(x), Nodo(y), weight = w) )
+        return totalCost, G
+
+
+
+
