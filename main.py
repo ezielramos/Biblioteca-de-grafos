@@ -1,19 +1,20 @@
 """
-Script principal del Proyecto 3: algoritmo de Dijkstra.
+Script principal del Proyecto 4: algoritmos de Kruskal y Prim.
 
 Genera un grafo ponderado con cada uno de los modelos implementados en
 Generador_Grafo (malla, Erdos-Renyi, Gilbert, geográfico simple,
-Barabasi-Albert y Dorogovtsev-Mendes), en dos tamaños (30 y 500 nodos),
+Barabasi-Albert y Dorogovtsev-Mendes), en dos tamaños (30 y 400 nodos),
 es decir, 12 grafos en total.
 
-Para cada grafo se calcula, a partir del nodo fuente 0, el árbol de
-caminos más cortos con Dijkstra (12 árboles). En los árboles, cada nodo
-se etiqueta con su distancia al origen, por ejemplo "nodo_2 (22.45)".
+Para cada grafo se calcula el árbol de expansión mínima (MST) con tres
+algoritmos: Prim, Kruskal directo (KruskalD) y Kruskal inverso
+(KruskalI), lo que da 36 árboles. El peso total de cada MST se imprime
+en consola; los tres algoritmos deben coincidir para un mismo grafo.
 
 Todos los grafos (generados y calculados) se guardan como archivos .dot
-en Proyecto_3_archivos, con una carpeta por modelo y una subcarpeta
-dijkstra para los árboles. Los .dot se abren en Gephi para generar las
-imágenes de visualización.
+en Proyecto_4_archivos, con una carpeta por modelo y una subcarpeta por
+algoritmo (prim, KruskalD y KruskalI) para los árboles. Los .dot se abren
+en Gephi para generar las imágenes de visualización.
 """
 
 from generadores_grafos import Generador_Grafo
